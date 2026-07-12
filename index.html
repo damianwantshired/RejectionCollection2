@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejection Collection | From unemployment to ununemployment</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Customizing Tailwind to match your specific dark-themed branding
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: { 900: '#111827', 800: '#1F2937', 700: '#374151' },
+                        purple: { 600: '#7E22CE', 500: '#9333EA', 100: '#F3E8FF' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        body { background-color: #0F172A; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        .celebration-piece { position: absolute; top: -10%; animation: celebration-fall 1.2s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes celebration-fall {
+            0% { transform: translate3d(0, 0, 0) scale(0.8) rotate(0deg); opacity: 0; }
+            15% { opacity: 1; }
+            100% { transform: translate3d(var(--drift-x), 115vh, 0) scale(1.1) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-200 min-h-screen">
+
+    <nav class="bg-dark-800 shadow-sm border-b border-dark-700 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-xl font-bold text-purple-500">
+                    <i data-lucide="target" class="w-6 h-6"></i>
+                    <span>Rejection Collection</span>
+                </div>
+                <span class="text-xs font-semibold uppercase tracking-[0.25em] text-purple-300/90">From unemployment to ununemployment</span>
+            </div>
+            <div class="flex gap-2 bg-dark-900 p-1 rounded-lg">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors bg-dark-700 shadow-sm text-purple-400">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </button>
+                <button onclick="switchTab('list')" id="btn-list" class="px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors text-gray-400 hover:text-white">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i> Applications
+                </button>
+                <button onclick="switchTab('add')" id="btn-add" class="px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors text-gray-400 hover:text-white">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New
+                </button>
+                <button onclick="switchTab('about')" id="btn-about" class="px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors text-gray-400 hover:text-white">
+                    <i data-lucide="info" class="w-4 h-4"></i> About
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="intro-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm">
+        <div class="mx-auto flex min-h-screen items-center justify-center p-4">
+            <div class="w-full max-w-3xl rounded-2xl border border-purple-500/30 bg-dark-800 p-6 shadow-2xl">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.25em] text-purple-300">First-time guide</p>
+                        <h2 class="mt-2 text-2xl font-bold text-white">Welcome to your rejection tracker</h2>
+                        <p class="mt-2 text-sm font-semibold uppercase tracking-[0.25em] text-purple-300">From unemployment to ununemployment</p>
+                        <p class="mt-3 text-sm leading-6 text-gray-300">This page is designed to make your job search feel calmer and clearer. Add each application once, then update it as things progress so you can see the full picture.</p>
+                    </div>
+                    <button onclick="closeIntroGuide()" class="rounded-full border border-dark-700 bg-dark-900 px-3 py-1 text-sm text-gray-300 hover:text-white">Skip</button>
+                </div>
+
+                <div class="mt-6 grid gap-4 md:grid-cols-3">
+                    <div class="rounded-xl border border-dark-700 bg-dark-900/70 p-4">
+                        <h3 class="font-semibold text-white">1. Add applications</h3>
+                        <p class="mt-2 text-sm text-gray-400">Use the Add New tab to save the role, company, and your initial impression of the fit.</p>
+                    </div>
+                    <div class="rounded-xl border border-dark-700 bg-dark-900/70 p-4">
+                        <h3 class="font-semibold text-white">2. Track progress</h3>
+                        <p class="mt-2 text-sm text-gray-400">On Applications, update each one as it moves from applied to interviewing, offered, rejected, or withdrawn.</p>
+                    </div>
+                    <div class="rounded-xl border border-dark-700 bg-dark-900/70 p-4">
+                        <h3 class="font-semibold text-white">3. Review the dashboard</h3>
+                        <p class="mt-2 text-sm text-gray-400">The dashboard turns your records into a simple visual summary so you can spot patterns quickly.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 rounded-xl border border-purple-800/40 bg-purple-900/20 p-4 text-sm text-purple-100">
+                    <p class="font-semibold">Tip: The score is meant to help you reflect, not judge yourself. A higher number means the opportunity feels like a stronger fit for you.</p>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button onclick="closeIntroGuide()" class="rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Start tracking</button>
+                    <button onclick="startWithExample()" class="rounded-lg border border-dark-700 bg-dark-900 px-4 py-2 font-semibold text-gray-200 hover:text-white">Show me the add form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main id="app-content" class="max-w-6xl mx-auto p-6 mt-4">
+    </main>
+
+    <div id="celebration-layer" class="pointer-events-none fixed inset-0 z-[60] overflow-hidden"></div>
+
+    <script>
+        // State Management
+        const STORAGE_PREFIX = 'rejectionCollection';
+        let activeTab = 'dashboard';
+        let collectionId = getCollectionId();
+        let applications = loadApplications();
+        let hasSeenIntro = localStorage.getItem(`${STORAGE_PREFIX}:seenIntro`) === 'true';
+
+        function createCollectionId() {
+            return window.crypto?.randomUUID?.() || `collection-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+
+        function getCollectionId() {
+            const fromStorage = localStorage.getItem(`${STORAGE_PREFIX}:id`);
+            const id = fromStorage || createCollectionId();
+
+            if (id !== fromStorage) {
+                localStorage.setItem(`${STORAGE_PREFIX}:id`, id);
+            }
+
+            return id;
+        }
+
+        function loadApplications() {
+            try {
+                const saved = localStorage.getItem(`${STORAGE_PREFIX}:apps:${collectionId}`);
+                if (!saved) return [];
+                const parsed = JSON.parse(saved);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                console.warn('Unable to load saved applications:', error);
+                return [];
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(`${STORAGE_PREFIX}:apps:${collectionId}`, JSON.stringify(applications));
+                localStorage.setItem(`${STORAGE_PREFIX}:tab:${collectionId}`, activeTab);
+            } catch (error) {
+                console.warn('Unable to save applications:', error);
+            }
+        }
+
+        function loadStoredTab() {
+            try {
+                const savedTab = localStorage.getItem(`${STORAGE_PREFIX}:tab:${collectionId}`);
+                if (savedTab) activeTab = savedTab;
+            } catch (error) {
+                console.warn('Unable to load saved tab:', error);
+            }
+        }
+
+        loadStoredTab();
+
+        function setIntroVisibility(isVisible) {
+            const modal = document.getElementById('intro-modal');
+            if (!modal) return;
+            modal.classList.toggle('hidden', !isVisible);
+            document.body.classList.toggle('overflow-hidden', isVisible);
+        }
+
+        function closeIntroGuide() {
+            hasSeenIntro = true;
+            localStorage.setItem(`${STORAGE_PREFIX}:seenIntro`, 'true');
+            setIntroVisibility(false);
+        }
+
+        function startWithExample() {
+            closeIntroGuide();
+            switchTab('add');
+        }
+
+        // UI Configuration Mapping
+        const statusColors = {
+            'Applied': 'bg-blue-900/30 text-blue-300 border-blue-800',
+            'Interviewing': 'bg-amber-900/30 text-amber-300 border-amber-800',
+            'Job Offer': 'bg-emerald-900/30 text-emerald-300 border-emerald-800',
+            'Rejected': 'bg-red-900/30 text-red-300 border-red-800',
+            'Withdrawal': 'bg-gray-800 text-gray-400 border-gray-700'
+        };
+
+        // Core Logic: Compatibility Calculation
+        function calculateCompatibility(qual, int) {
+            return Math.round(((parseInt(qual) + parseInt(int)) / 20) * 100);
+        }
+
+        // Navigation Logic
+        function switchTab(tab) {
+            activeTab = tab;
+            saveState();
+            // Updates button styles to show active state
+            ['dashboard', 'list', 'add', 'about'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                btn.className = (t === tab) 
+                    ? 'px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors bg-dark-700 shadow-sm text-purple-400'
+                    : 'px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors text-gray-400 hover:text-white';
+            });
+            renderApp();
+        }
+
+        // Data Manipulation Functions
+        function deleteApplication(id) {
+            applications = applications.filter(app => app.id !== id);
+            saveState();
+            renderApp();
+        }
+
+        function updateStatus(id, newStatus) {
+            const targetApp = applications.find(app => app.id === id);
+            const alreadyOffer = targetApp?.status === 'Job Offer';
+            applications = applications.map(app => app.id === id ? {
+                ...app,
+                status: newStatus,
+                reachedInterview: app.reachedInterview || newStatus === 'Interviewing' || newStatus === 'Job Offer'
+            } : app);
+            saveState();
+            renderApp();
+            if (newStatus === 'Job Offer' && !alreadyOffer) {
+                launchCelebration('money');
+            }
+        }
+
+        function getStatusActions(app) {
+            if (app.status === 'Applied') {
+                return [
+                    { label: 'Start interview', status: 'Interviewing', icon: 'calendar-check', classes: 'bg-amber-500/15 text-amber-300 border-amber-700 hover:bg-amber-500/25' },
+                    { label: 'Rejected', status: 'Rejected', icon: 'x-circle', classes: 'bg-red-500/10 text-red-300 border-red-900 hover:bg-red-500/20' },
+                    { label: 'Withdraw', status: 'Withdrawal', icon: 'log-out', classes: 'bg-gray-500/10 text-gray-300 border-gray-700 hover:bg-gray-500/20' }
+                ];
+            }
+
+            if (app.status === 'Interviewing') {
+                return [
+                    { label: 'Job offer', status: 'Job Offer', icon: 'party-popper', classes: 'bg-emerald-500/15 text-emerald-300 border-emerald-800 hover:bg-emerald-500/25' },
+                    { label: 'Rejected', status: 'Rejected', icon: 'x-circle', classes: 'bg-red-500/10 text-red-300 border-red-900 hover:bg-red-500/20' },
+                    { label: 'Withdraw', status: 'Withdrawal', icon: 'log-out', classes: 'bg-gray-500/10 text-gray-300 border-gray-700 hover:bg-gray-500/20' }
+                ];
+            }
+
+            return [];
+        }
+
+        function launchCelebration(type = 'confetti') {
+            const layer = document.getElementById('celebration-layer');
+            if (!layer) return;
+
+            const palette = type === 'money' ? ['💵', '💸', '💰'] : ['✨', '💜', '🌈', '⭐'];
+            const count = type === 'money' ? 16 : 24;
+
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'celebration-piece text-2xl select-none';
+                piece.textContent = palette[i % palette.length];
+                piece.style.left = `${Math.random() * 100}%`;
+                piece.style.setProperty('--drift-x', `${(Math.random() - 0.5) * 220}px`);
+                piece.style.animationDuration = `${1000 + Math.random() * 300}ms`;
+                piece.style.opacity = '0';
+                layer.appendChild(piece);
+
+                setTimeout(() => piece.remove(), 1500);
+            }
+        }
+
+        function handleAddJob(event) {
+            event.preventDefault();
+            const form = event.target;
+            const newApp = {
+                id: Date.now(),
+                role: form.role.value,
+                company: form.company.value,
+                employmentType: form.employmentType.value,
+                distanceMiles: parseFloat(form.distanceMiles.value),
+                qualScore: parseInt(form.qualScore.value),
+                intScore: parseInt(form.intScore.value),
+                status: form.status.value,
+                reachedInterview: form.status.value === 'Interviewing'
+            };
+            applications.unshift(newApp);
+            saveState();
+            launchCelebration('confetti');
+            switchTab('list');
+        }
+
+        // Google Chart Initialization
+        google.charts.load('current', {'packages':['sankey']});
+        google.charts.setOnLoadCallback(() => { if (activeTab === 'dashboard') drawChart(); });
+
+        function drawChart() {
+            const container = document.getElementById('sankey_diagram');
+            if (!container || applications.length === 0) return;
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'From');
+            data.addColumn('string', 'To');
+            data.addColumn('number', 'Weight');
+
+            const applied = applications.filter(a => a.status === 'Applied').length;
+            const interviewing = applications.filter(a => a.status === 'Interviewing').length;
+            const offer = applications.filter(a => a.status === 'Job Offer').length;
+            const rejectedBeforeInterview = applications.filter(a => a.status === 'Rejected' && !a.reachedInterview).length;
+            const rejectedAfterInterview = applications.filter(a => a.status === 'Rejected' && a.reachedInterview).length;
+            const withdrawnBeforeInterview = applications.filter(a => a.status === 'Withdrawal' && !a.reachedInterview).length;
+            const withdrawnAfterInterview = applications.filter(a => a.status === 'Withdrawal' && a.reachedInterview).length;
+
+            const interviewStage = interviewing + offer + rejectedAfterInterview + withdrawnAfterInterview;
+            const rows = [];
+            
+            if (applied > 0) rows.push(['Total Applications', 'Awaiting Response', applied]);
+            if (interviewStage > 0) rows.push(['Total Applications', 'Interview Stage', interviewStage]);
+            if (rejectedBeforeInterview > 0) rows.push(['Total Applications', 'Rejected', rejectedBeforeInterview]);
+            if (withdrawnBeforeInterview > 0) rows.push(['Total Applications', 'Withdrawn', withdrawnBeforeInterview]);
+            if (interviewing > 0) rows.push(['Interview Stage', 'Currently Interviewing', interviewing]);
+            if (offer > 0) rows.push(['Interview Stage', 'Job Offers', offer]);
+            if (rejectedAfterInterview > 0) rows.push(['Interview Stage', 'Rejected After Interview', rejectedAfterInterview]);
+            if (withdrawnAfterInterview > 0) rows.push(['Interview Stage', 'Withdrew After Interview', withdrawnAfterInterview]);
+
+            data.addRows(rows);
+
+            const options = {
+                width: '100%', height: 400,
+                sankey: {
+                    node: {
+                        colors: ['#8b5cf6', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280', '#10b981'],
+                        label: { fontSize: 14, color: '#e5e7eb', bold: true }
+                    },
+                    link: { colorMode: 'gradient', fillOpacity: 0.6 }
+                }
+            };
+            new google.visualization.Sankey(container).draw(data, options);
+        }
+
+        // UI Rendering Components
+        function renderDashboard() {
+            const interviewing = applications.filter(a => a.status === 'Interviewing').length;
+            const offers = applications.filter(a => a.status === 'Job Offer').length;
+            const avgComp = applications.length > 0 
+                ? Math.round(applications.reduce((acc, curr) => acc + calculateCompatibility(curr.qualScore, curr.intScore), 0) / applications.length)
+                : 0;
+
+            return `
+                <div class="space-y-6 fade-in">
+                    <div class="bg-purple-900/20 border border-purple-500/30 p-4 rounded-lg">
+                        <h4 class="font-bold text-purple-200">How this tracker works</h4>
+                        <p class="text-sm text-purple-300 mt-2">Think of this as a calm, simple record of your job search. Each application gets one entry. Add the details once, then update the outcome later so you can see what is moving forward and what is not.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${[{label: 'Total', val: applications.length, color: 'text-white'}, {label: 'Interviewing', val: interviewing, color: 'text-amber-400'}, {label: 'Offers', val: offers, color: 'text-emerald-400'}, {label: 'Match', val: avgComp + '%', color: 'text-purple-400'}].map(stat => `
+                            <div class="bg-dark-800 p-4 rounded-xl shadow-sm border border-dark-700">
+                                <p class="text-xs text-gray-400 uppercase tracking-wider">${stat.label}</p>
+                                <p class="text-3xl font-bold ${stat.color}">${stat.val}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${applications.length === 0 ? `
+                        <div class="rounded-xl border border-dashed border-purple-500/30 bg-dark-900/50 p-5 text-sm text-gray-300">
+                            <p class="font-semibold text-white">You have not logged any applications yet.</p>
+                            <p class="mt-2">Start by adding your first role. The form explains each field and helps you choose a clear next step.</p>
+                            <button onclick="switchTab('add')" class="mt-4 rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Add your first application</button>
+                        </div>
+                    ` : `
+                        <div class="bg-dark-800 p-6 rounded-xl shadow-sm border border-dark-700">
+                            <h3 class="text-lg font-semibold text-white mb-4">Application Flow</h3>
+                            <div id="sankey_diagram" class="w-full h-[400px]"></div>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderList() {
+            return `
+                <div class="space-y-4 fade-in">
+                    <div class="rounded-xl border border-dark-700 bg-dark-800 p-5">
+                        <h2 class="text-2xl font-bold text-white">Your Applications</h2>
+                        <p class="mt-2 text-sm text-gray-400">This is your live record. Use it to keep each application clear and decide the next step when you hear back.</p>
+                    </div>
+                    ${applications.length === 0 ? `
+                        <div class="rounded-xl border border-dashed border-purple-500/30 bg-dark-900/50 p-5 text-sm text-gray-300">
+                            <p class="font-semibold text-white">Nothing is here yet.</p>
+                            <p class="mt-2">Add your first application and it will appear here with buttons to update the outcome.</p>
+                            <button onclick="switchTab('add')" class="mt-4 rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Create your first entry</button>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${applications.map(app => {
+                                const comp = calculateCompatibility(app.qualScore, app.intScore);
+                                const actions = getStatusActions(app);
+                                return `
+                                    <div class="bg-dark-800 p-5 rounded-xl border border-dark-700">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-bold text-white">${app.role}</h3>
+                                            <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded border ${statusColors[app.status]}">${app.status}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-400 mb-3">${app.company}</p>
+                                        <div class="flex flex-wrap gap-2 mb-4 text-xs text-gray-300">
+                                            <span class="inline-flex items-center gap-1.5 rounded-full border border-dark-700 bg-dark-900 px-2.5 py-1">
+                                                <i data-lucide="clock-3" class="w-3.5 h-3.5 text-purple-400"></i>${app.employmentType || 'Not specified'}
+                                            </span>
+                                            <span class="inline-flex items-center gap-1.5 rounded-full border border-dark-700 bg-dark-900 px-2.5 py-1">
+                                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>${Number.isFinite(app.distanceMiles) ? `${app.distanceMiles} ${app.distanceMiles === 1 ? 'mile' : 'miles'} away` : 'Distance not specified'}
+                                            </span>
+                                        </div>
+                                        <div class="w-full bg-dark-900 rounded-full h-2 mb-4">
+                                            <div class="bg-purple-600 h-2 rounded-full" style="width: ${comp}%"></div>
+                                        </div>
+                                        ${actions.length > 0 ? `
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500 mb-2">${app.status === 'Interviewing' ? 'Record interview outcome' : 'Next step'}</p>
+                                            <div class="grid grid-cols-1 gap-2 mb-3">
+                                                ${actions.map(action => `
+                                                    <button onclick="updateStatus(${app.id}, '${action.status}')" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${action.classes}">
+                                                        <i data-lucide="${action.icon}" class="w-3.5 h-3.5"></i>${action.label}
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+                                        ` : `
+                                            <div class="mb-3 rounded-lg border border-dark-700 bg-dark-900/60 px-3 py-2 text-xs text-gray-400">
+                                                ${app.status === 'Job Offer' ? 'Interview completed with an offer.' : app.status === 'Rejected' && app.reachedInterview ? 'Interview completed with a rejection.' : app.status === 'Withdrawal' && app.reachedInterview ? 'Withdrawn during the interview process.' : 'Application closed.'}
+                                            </div>
+                                        `}
+                                        <div class="flex justify-end">
+                                            <button onclick="deleteApplication(${app.id})" aria-label="Delete ${app.role} application" class="text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            return `
+                <div class="max-w-4xl mx-auto space-y-6 fade-in">
+                    <div class="rounded-2xl border border-purple-500/25 bg-purple-900/15 p-6">
+                        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-purple-300">About Rejection Collection</p>
+                        <h2 class="mt-3 text-3xl font-bold text-white">A calmer, clearer way to manage the job search</h2>
+                        <p class="mt-4 text-base leading-7 text-gray-300">
+                            The job search was already difficult enough without having to juggle five different websites, spreadsheets, and notes just to keep track of applications. Rejection Collection was created to bring the most useful parts of that process into one focused, organized place designed specifically for getting a job.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="rounded-2xl border border-dark-700 bg-dark-800 p-6">
+                            <h3 class="text-xl font-semibold text-white">Why it exists</h3>
+                            <p class="mt-3 text-sm leading-7 text-gray-400">
+                                The goal is simple: reduce the chaos of the hiring process and give applicants a thoughtful space to reflect, organize, and move forward with confidence. It is a tool built for clarity, momentum, and progress.
+                            </p>
+                        </div>
+                        <div class="rounded-2xl border border-dark-700 bg-dark-800 p-6">
+                            <h3 class="text-xl font-semibold text-white">The story behind it</h3>
+                            <p class="mt-3 text-sm leading-7 text-gray-400">
+                                The creator was only 17 when they became frustrated with how impersonal and unsatisfying the hiring process felt. Rather than accept that frustration, they built this tool to make the experience more intentional and more manageable for others.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-dark-700 bg-dark-900/60 p-6">
+                        <h3 class="text-xl font-semibold text-white">What makes it different</h3>
+                        <ul class="mt-4 space-y-3 text-sm leading-7 text-gray-400">
+                            <li>• One place to record applications, progress, and outcomes.</li>
+                            <li>• A simple way to reflect on fit and interest without overcomplicating the process.</li>
+                            <li>• A calm, encouraging experience designed to help people keep moving forward.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdd() {
+            return `
+                <div class="max-w-2xl mx-auto fade-in">
+                    <div class="mb-6 rounded-xl border border-purple-800/30 bg-purple-900/20 p-5">
+                        <h3 class="font-semibold text-white">How to fill this out</h3>
+                        <ul class="mt-3 space-y-2 text-sm text-purple-100">
+                            <li>• Add the role and company so you can find the record again later.</li>
+                            <li>• Use the two scores to reflect how well the job fits you and how interested you are in it.</li>
+                            <li>• Choose Applied if you are waiting for a response, or Interviewing if you have already moved forward.</li>
+                        </ul>
+                    </div>
+                    <form onsubmit="handleAddJob(event)" class="bg-dark-800 p-8 rounded-xl border border-dark-700">
+                        <h2 class="text-2xl font-bold text-white mb-6">Log New Application</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="role" class="block text-sm font-medium text-gray-300 mb-1.5">Job title</label>
+                                <input id="role" type="text" name="role" required placeholder="e.g. Frontend Developer" class="w-full bg-dark-900 border border-dark-700 rounded p-2 text-white">
+                            </div>
+                            <div>
+                                <label for="company" class="block text-sm font-medium text-gray-300 mb-1.5">Company</label>
+                                <input id="company" type="text" name="company" required placeholder="e.g. TechCorp" class="w-full bg-dark-900 border border-dark-700 rounded p-2 text-white">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="employmentType" class="block text-sm font-medium text-gray-300 mb-1.5">Employment type</label>
+                                    <select id="employmentType" name="employmentType" required class="w-full bg-dark-900 border border-dark-700 rounded p-2 text-white">
+                                        <option value="Full time">Full time</option>
+                                        <option value="Part time">Part time</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="distanceMiles" class="block text-sm font-medium text-gray-300 mb-1.5">Distance from you</label>
+                                    <div class="relative">
+                                        <input id="distanceMiles" type="number" name="distanceMiles" min="0" step="0.1" inputmode="decimal" placeholder="Optional" class="w-full bg-dark-900 border border-dark-700 rounded py-2 pl-2 pr-14 text-white">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">miles</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-purple-900/20 border border-purple-800 rounded space-y-5">
+                                <div>
+                                    <div class="flex items-center justify-between gap-4 mb-1">
+                                        <label for="qualScore" class="block text-sm font-semibold text-purple-200">Qualifications Score</label>
+                                        <output id="qualScoreValue" for="qualScore" class="text-sm font-bold text-white">5 / 10</output>
+                                    </div>
+                                    <p id="qualScoreHelp" class="text-xs leading-relaxed text-purple-300 mb-3">Rate how well your experience, education, certifications, and skills line up with the job's qualifications.</p>
+                                    <input id="qualScore" type="range" name="qualScore" min="1" max="10" value="5" aria-describedby="qualScoreHelp" oninput="document.getElementById('qualScoreValue').value = this.value + ' / 10'" class="w-full accent-purple-500">
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between gap-4 mb-1">
+                                        <label for="intScore" class="block text-sm font-semibold text-purple-200">Interest Score</label>
+                                        <output id="intScoreValue" for="intScore" class="text-sm font-bold text-white">5 / 10</output>
+                                    </div>
+                                    <p id="intScoreHelp" class="text-xs leading-relaxed text-purple-300 mb-3">Rate the type of work, the expected hours, and how much the opportunity genuinely interests you.</p>
+                                    <input id="intScore" type="range" name="intScore" min="1" max="10" value="5" aria-describedby="intScoreHelp" oninput="document.getElementById('intScoreValue').value = this.value + ' / 10'" class="w-full accent-purple-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-300 mb-1.5">Application status</label>
+                                <select id="status" name="status" class="w-full bg-dark-900 border border-dark-700 rounded p-2 text-white">
+                                    <option value="Applied">Applied</option>
+                                    <option value="Interviewing">Interviewing</option>
+                                </select>
+                                <p class="mt-2 text-xs text-gray-500">Select Interviewing if you have already reached that stage so the tracker can reflect it correctly.</p>
+                            </div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded font-bold">Save application</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        // Main App Orchestrator
+        function renderApp() {
+            const contentDiv = document.getElementById('app-content');
+            contentDiv.innerHTML = activeTab === 'dashboard' ? renderDashboard() : activeTab === 'list' ? renderList() : activeTab === 'about' ? renderAbout() : renderAdd();
+            lucide.createIcons(); // Re-initialize icons for new DOM elements
+            if (activeTab === 'dashboard') setTimeout(drawChart, 50);
+        }
+
+        renderApp(); // Initial load
+
+        if (!hasSeenIntro) {
+            setTimeout(() => setIntroVisibility(true), 250);
+        }
+    </script>
+</body>
+</html>
