@@ -1,2 +1,2 @@
-# RejectionCollection2
+# RejectionCollection
 A tool to help you keep track of your job search!
